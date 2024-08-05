@@ -3,13 +3,13 @@ Company/Department: PokeDex Inc.
 What the company or department does: PokeDex Inc. manages a comprehensive database of Pokemon, specifically focusing on the first two generations. The database includes detailed information about each Pokemon, their abilities, moves, and stats.
 
 Vision and Objective
-Objective of the company or company‘s department: The objective of PokeDex Inc. is to provide Pokemon trainers and enthusiasts with accurate and comprehensive information about Pokemon to help them in training, battling, and understanding the attributes of various Pokemon.
+The objective of PokeDex Inc. is to provide Pokemon trainers and enthusiasts with accurate and comprehensive information about Pokemon to help them in training, battling, and understanding the attributes of various Pokemon.
 
 Mission Statement
-Business solution that the company or company‘s department offers: PokeDex Inc. offers a well-organized, accessible, and detailed database system that provides essential information about Pokemon, facilitating trainers in making informed decisions for training and battling purposes.
+PokeDex Inc. offers a well-organized, accessible, and detailed database system that provides essential information about Pokemon, facilitating trainers in making informed decisions for training and battling purposes.
 
 Service
-Describe the company service or company department: PokeDex Inc. offers a database service that includes:
+PokeDex Inc. offers a database service that includes:
 
 Detailed Pokemon data from the first two generations
 Information on Pokemon abilities, stats, and moves
@@ -18,15 +18,15 @@ Use Case
 What is the use case for this solution?: Trainers and researchers can use the PokeDex Inc. database to look up specific Pokemon information, compare stats, plan battle strategies, and enhance their training programs by understanding Pokemon abilities and move sets.
 
 Business Requirements
-Describe the business requirements:
 
 The database must include all Pokemon from the first two generations.
 Each Pokemon entry must have attributes like ID, name, type(s), and generation.
 Detailed stats (HP, Attack, Defense, etc.) must be included for each Pokemon.
 Information about abilities and moves, including how and when moves are learned.
 Support for queries to retrieve and compare Pokemon data.
+
 Entity-Relational Model Diagram
-Diagram
+**FIXME: GET DIAGRAM**
 Diagram description:
 
 Pokemon Table: Contains basic information about each Pokemon.
