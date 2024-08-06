@@ -1,4 +1,4 @@
-id,identifier,Type 1,Type 2,Generation
+pokemon_id,name,type1,type2,generation
 1,bulbasaur,,,
 2,ivysaur,,,
 3,venusaur,,,
