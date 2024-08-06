@@ -1,6 +1,6 @@
 DROP DATABASE IF EXISTS pokemon_db;
 
-CREATE DATABASE IF NOT EXISTS pokemon_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS pokemon_db;
 USE pokemon_db;
 
 CREATE TABLE IF NOT EXISTS TypesOfPokemon (
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS Pokemon (
     pokemon_id INT PRIMARY KEY,
     name VARCHAR(50),
     type1 INT,
-    type2 INT,
+    type2 INT DEFAULT -1,
     generation INT,
     FOREIGN KEY (type1) REFERENCES TypesOfPokemon(numberID),
     FOREIGN KEY (type2) REFERENCES TypesOfPokemon(numberID)
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS Stats (
 );
 
 CREATE TABLE IF NOT EXISTS Abilities (
-    ability_id INT PRIMARY KEY AUTO_INCREMENT,
+    ability_id INT PRIMARY KEY,
     name VARCHAR(50)
 );
 
@@ -71,13 +71,33 @@ LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (typeName, numberID);
 
--- Load data into Pokemon table
+-- Load data into Pokemon table, treating empty strings as NULL
 LOAD DATA INFILE '/var/lib/mysql-files/pokemon.csv'
 INTO TABLE Pokemon
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(pokemon_id, name, type1, type2, generation);
+(pokemon_id, name, type1, @type2, generation)
+SET type2 = NULLIF(@type2, '');
+
+-- Load data into Moves table
+LOAD DATA INFILE '/var/lib/mysql-files/moves.csv'
+INTO TABLE Moves
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(move_id, name, type, power, accuracy, pp);
+
+-- Load data into Abilities table
+LOAD DATA INFILE '/var/lib/mysql-files/abilities.csv'
+INTO TABLE Abilities
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(ability_id, name);
 
 -- Correct table name in the SELECT statement
 SELECT * FROM TypesOfPokemon;
+SELECT * FROM Pokemon;
+SELECT * FROM Moves;
+SELECT * FROM Abilities;
