@@ -1,19 +1,25 @@
 DROP DATABASE IF EXISTS pokemon_db;
 
-CREATE DATABASE pokemon_db;
+CREATE DATABASE IF NOT EXISTS pokemon_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE pokemon_db;
 
-
-CREATE TABLE Pokemon (
-    pokemon_id INT PRIMARY KEY,
-    name VARCHAR(50),
-    type1 VARCHAR(20),
-    type2 VARCHAR(20),
-    generation INT
+CREATE TABLE IF NOT EXISTS TypesOfPokemon (
+    typeName VARCHAR(15),
+    numberID INT PRIMARY KEY
 );
 
-CREATE TABLE Stats (
-    stat_id INT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS Pokemon (
+    pokemon_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    type1 INT,
+    type2 INT,
+    generation INT,
+    FOREIGN KEY (type1) REFERENCES TypesOfPokemon(numberID),
+    FOREIGN KEY (type2) REFERENCES TypesOfPokemon(numberID)
+);
+
+CREATE TABLE IF NOT EXISTS Stats (
+    stat_id INT PRIMARY KEY AUTO_INCREMENT,
     pokemon_id INT,
     hp INT,
     attack INT,
@@ -24,12 +30,12 @@ CREATE TABLE Stats (
     FOREIGN KEY (pokemon_id) REFERENCES Pokemon(pokemon_id)
 );
 
-CREATE TABLE Abilities (
-    ability_id INT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS Abilities (
+    ability_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50)
 );
 
-CREATE TABLE Pokemon_Abilities (
+CREATE TABLE IF NOT EXISTS Pokemon_Abilities (
     pokemon_id INT,
     ability_id INT,
     PRIMARY KEY (pokemon_id, ability_id),
@@ -37,16 +43,17 @@ CREATE TABLE Pokemon_Abilities (
     FOREIGN KEY (ability_id) REFERENCES Abilities(ability_id)
 );
 
-CREATE TABLE Moves (
-    move_id INT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS Moves (
+    move_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50),
-    type VARCHAR(20),
+    type INT,
     power INT,
     accuracy INT,
-    pp INT
+    pp INT,
+    FOREIGN KEY (type) REFERENCES TypesOfPokemon(numberID)
 );
 
-CREATE TABLE Pokemon_Moves (
+CREATE TABLE IF NOT EXISTS Pokemon_Moves (
     pokemon_id INT,
     move_id INT,
     learn_method ENUM('level_up', 'tm', 'hm', 'egg', 'tutor', 'other'),
@@ -56,33 +63,21 @@ CREATE TABLE Pokemon_Moves (
     FOREIGN KEY (move_id) REFERENCES Moves(move_id)
 );
 
+-- Load data into TypesOfPokemon table first
+LOAD DATA INFILE '/var/lib/mysql-files/pokemon_types.csv'
+INTO TABLE TypesOfPokemon
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(typeName, numberID);
 
-INSERT INTO Pokemon (pokemon_id, name, type1, type2, generation) VALUES
-(1, 'Bulbasaur', 'Grass', 'Poison', 1),
-(4, 'Charmander', 'Fire', NULL, 1),
-(152, 'Chikorita', 'Grass', NULL, 2);
+-- Load data into Pokemon table
+LOAD DATA INFILE '/var/lib/mysql-files/pokemon.csv'
+INTO TABLE Pokemon
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(pokemon_id, name, type1, type2, generation);
 
-INSERT INTO Stats (stat_id, pokemon_id, hp, attack, defense, special_attack, special_defense, speed) VALUES
-(1, 1, 45, 49, 49, 65, 65, 45),
-(2, 4, 39, 52, 43, 60, 50, 65),
-(3, 152, 45, 49, 65, 49, 65, 45);
-
-INSERT INTO Abilities (ability_id, name) VALUES
-(1, 'Overgrow'),
-(2, 'Blaze'),
-(3, 'Torrent');
-
-INSERT INTO Pokemon_Abilities (pokemon_id, ability_id) VALUES
-(1, 1),
-(4, 2),
-(152, 1);
-
-INSERT INTO Moves (move_id, name, type, power, accuracy, pp) VALUES
-(1, 'Tackle', 'Normal', 40, 100, 35),
-(2, 'Ember', 'Fire', 40, 100, 25),
-(3, 'Razor Leaf', 'Grass', 55, 95, 25);
-
-INSERT INTO Pokemon_Moves (pokemon_id, move_id, learn_method, level) VALUES
-(1, 1, 'level_up', 1),
-(4, 2, 'level_up', 7),
-(152, 3, 'level_up', 6);
+-- Correct table name in the SELECT statement
+SELECT * FROM TypesOfPokemon;
