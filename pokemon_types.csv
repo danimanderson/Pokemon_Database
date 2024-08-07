@@ -1,4 +1,4 @@
-Type,Number
+TypeName,NumberID
 Normal,1
 Fire,2
 Water,3
@@ -16,4 +16,3 @@ Ghost,14
 Dragon,15
 Dark,16
 Steel,17
-Fairy,18
