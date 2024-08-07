@@ -1,75 +1,71 @@
 DROP DATABASE IF EXISTS pokemon_db;
 
-CREATE DATABASE IF NOT EXISTS pokemon_db;
+CREATE DATABASE pokemon_db;
 USE pokemon_db;
 
-CREATE TABLE IF NOT EXISTS TypesOfPokemon (
-    typeName VARCHAR(15),
-    numberID INT PRIMARY KEY
+CREATE TABLE Pokemon_Regions (
+    ID INT PRIMARY KEY,
+    Region VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Pokemon (
+CREATE TABLE Abilities (
+    id INT PRIMARY KEY,
+    identifier VARCHAR(255) NOT NULL,
+    generation_id INT NOT NULL,
+    FOREIGN KEY (generation_id) REFERENCES Pokemon_Regions(ID)
+);
+
+CREATE TABLE Pokemon_Types (
+    TypeName VARCHAR(20) NOT NULL,
+    NumberID INT PRIMARY KEY
+);
+
+CREATE TABLE Moves (
+    move_id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    generation_id INT NOT NULL,
+    type_id INT NOT NULL,
+    power INT,
+    pp INT,
+    accuracy INT,
+    FOREIGN KEY (generation_id) REFERENCES Pokemon_Regions(ID)
+);
+
+
+CREATE TABLE Pokemon (
     pokemon_id INT PRIMARY KEY,
-    name VARCHAR(50),
-    type1 INT,
-    type2 INT DEFAULT -1,
-    generation INT,
-    FOREIGN KEY (type1) REFERENCES TypesOfPokemon(numberID),
-    FOREIGN KEY (type2) REFERENCES TypesOfPokemon(numberID)
+    name VARCHAR(255) NOT NULL,
+    type1 INT NOT NULL,
+    type2 INT DEFAULT NULL,
+    generation INT NOT NULL,
+    FOREIGN KEY (type1) REFERENCES Pokemon_Types(NumberID),
+    FOREIGN KEY (type2) REFERENCES Pokemon_Types(NumberID),
+    FOREIGN KEY (generation) REFERENCES Pokemon_Regions(ID)
 );
 
-CREATE TABLE IF NOT EXISTS Stats (
-    stat_id INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE Pokemon_Moves (
     pokemon_id INT,
-    hp INT,
-    attack INT,
-    defense INT,
-    special_attack INT,
-    special_defense INT,
-    speed INT,
+    move_id MEDIUMTEXT,
+    PRIMARY KEY (pokemon_id),
     FOREIGN KEY (pokemon_id) REFERENCES Pokemon(pokemon_id)
 );
 
-CREATE TABLE IF NOT EXISTS Abilities (
-    ability_id INT PRIMARY KEY,
-    name VARCHAR(50)
-);
 
-CREATE TABLE IF NOT EXISTS Pokemon_Abilities (
-    pokemon_id INT,
-    ability_id INT,
-    PRIMARY KEY (pokemon_id, ability_id),
-    FOREIGN KEY (pokemon_id) REFERENCES Pokemon(pokemon_id),
-    FOREIGN KEY (ability_id) REFERENCES Abilities(ability_id)
-);
-
-CREATE TABLE IF NOT EXISTS Moves (
-    move_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50),
-    type INT,
-    power INT,
-    accuracy INT,
-    pp INT,
-    FOREIGN KEY (type) REFERENCES TypesOfPokemon(numberID)
-);
-
-CREATE TABLE IF NOT EXISTS Pokemon_Moves (
-    pokemon_id INT,
-    move_id INT,
-    learn_method ENUM('level_up', 'tm', 'hm', 'egg', 'tutor', 'other'),
-    level INT,
-    PRIMARY KEY (pokemon_id, move_id, learn_method, level),
-    FOREIGN KEY (pokemon_id) REFERENCES Pokemon(pokemon_id),
-    FOREIGN KEY (move_id) REFERENCES Moves(move_id)
-);
-
--- Load data into TypesOfPokemon table first
-LOAD DATA INFILE '/var/lib/mysql-files/pokemon_types.csv'
-INTO TABLE TypesOfPokemon
+-- Load data into Pokemon_Regions table
+LOAD DATA INFILE '/var/lib/mysql-files/Pokemon_Regions.csv'
+INTO TABLE Pokemon_Regions
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(typeName, numberID);
+(ID, Region);
+
+-- Load data into TypesOfPokemon table first
+LOAD DATA INFILE '/var/lib/mysql-files/pokemon_types.csv'
+INTO TABLE Pokemon_Types
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(TypeName, NumberID);
 
 -- Load data into Pokemon table, treating empty strings as NULL
 LOAD DATA INFILE '/var/lib/mysql-files/pokemon.csv'
@@ -86,7 +82,9 @@ INTO TABLE Moves
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(move_id, name, type, power, accuracy, pp);
+(move_id, name, generation_id, type_id, @power, @pp, accuracy)
+SET power = NULLIF(@power, ''),
+pp = NULLIF(@pp, '');
 
 -- Load data into Abilities table
 LOAD DATA INFILE '/var/lib/mysql-files/abilities.csv'
@@ -94,10 +92,22 @@ INTO TABLE Abilities
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(ability_id, name);
+(id, identifier, generation_id);
+
+-- Loads data in Pokemon_Moves table
+LOAD DATA INFILE '/var/lib/mysql-files/pokemon_moves.csv'
+INTO TABLE Pokemon_Moves
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(pokemon_id, move_id);
+
 
 -- Correct table name in the SELECT statement
-SELECT * FROM TypesOfPokemon;
-SELECT * FROM Pokemon;
-SELECT * FROM Moves;
-SELECT * FROM Abilities;
+SELECT * FROM Pokemon_Types LIMIT 10;
+SELECT * FROM Pokemon LIMIT 10;
+SELECT * FROM Moves LIMIT 10;
+SELECT * FROM Abilities LIMIT 10;
+SELECT * FROM Pokemon_Regions LIMIT 10;
+SELECT * FROM Pokemon_Moves LIMIT 10;
